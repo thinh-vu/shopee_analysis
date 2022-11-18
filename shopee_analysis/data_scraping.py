@@ -1,4 +1,3 @@
-# I. Transcribe Youtube Videos
 from .util import *
 import pandas as pd
 from pandas import json_normalize
