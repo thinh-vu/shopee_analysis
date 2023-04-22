@@ -1,8 +1,8 @@
-from .util import *
+from ur_gadget import *
 import pandas as pd
 from pandas import json_normalize
 import requests
-import time
+# import time
 # import json
 # import io
 
@@ -28,15 +28,15 @@ def category_list(url='https://shopee.vn/api/v4/pages/get_category_tree'):
   df = json_normalize(response['data']['category_list'])
   return df
 
-# Section name: Home > Tìm kiếm hàng đầu
-def top_product_key (url='https://shopee.vn/api/v4/recommend/recommend?bundle=top_products_homepage&limit=50'):
-  """Return a list of top product keys which can be used to extract item details further"""
-  response = api_request(url)
-  # update_time = response['data']['update_time']
-  ls_count =len(response['data']['sections'])
-  total_item = response['data']['sections'][0]['total']
-  key_df = json_normalize(response['data']['sections'][0]['index']).drop(columns=['data_type', 'filtered', 'filtered_dunit'])
-  return key_df
+# # Section name: Home > Tìm kiếm hàng đầu - Stop working due to not login
+# def top_product_key (url='https://shopee.vn/api/v4/recommend/recommend?bundle=top_products_homepage&limit=50'):
+#   """Return a list of top product keys which can be used to extract item details further"""
+#   response = api_request(url)
+#   # update_time = response['data']['update_time']
+#   ls_count =len(response['data']['sections'])
+#   total_item = response['data']['sections'][0]['total']
+#   key_df = json_normalize(response['data']['sections'][0]['index']).drop(columns=['data_type', 'filtered', 'filtered_dunit'])
+#   return key_df
 
 # Shopee Mall index: https://shopee.vn/mall/brands
 def mall_index_all(url='https://shopee.vn/api/v4/official_shop/get_shops_by_category?need_zhuyin=0&category_id=-1'):
@@ -52,7 +52,10 @@ def mall_index_all(url='https://shopee.vn/api/v4/official_shop/get_shops_by_cate
       df = pd.concat([df, df1])
   df['created_time'] = pd.to_datetime(df['ctime'],unit='s').dt.date
   df['logo'] = 'https://cf.shopee.vn/file/' + df['logo']
-  df = df[['index', 'username', 'brand_name', 'shopid', 'created_time', 'logo']]
+  df['created_year'] = pd.to_datetime(df['created_time']).dt.year
+  df['created_month'] = pd.to_datetime(df['created_time']).dt.month
+  df['created_day'] = pd.to_datetime(df['created_time']).dt.day
+  df = df[['index', 'username', 'brand_name', 'shopid', 'logo', 'created_time', 'created_year', 'created_month', 'created_day']]
   return df
 
 # Get Shop Info by Shop ID
